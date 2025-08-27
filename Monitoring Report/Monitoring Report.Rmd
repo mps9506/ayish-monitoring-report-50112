@@ -1,0 +1,693 @@
+---
+title: "Ayish Bayou Water Quality Monitoring Report"
+author:
+  - Michael Schramm ^1^, Lucas Gregory ^2^, Jeremiah Poling ^3^, Emylea Cole ^3^
+  - ^1^ Texas Water Resources Institute, Texas A\&M AgriLife Research
+  - ^2^ Texas Water Resources Institute, Texas A\&M AgriLife Extension Service
+  - ^3^ Angelina \& Neches River Authority 
+date: "April 1, 2021"
+output: 
+  officedown::rdocx_document:
+    reference_docx: format.docx
+    plots:
+      style: Normal
+      align: center
+      fig.lp: 'fig:'
+      topcaption: false
+      caption:
+        style: Image Caption
+        pre: 'Figure '
+        sep: '. '
+        tnd: 0
+        tns: '-'
+        fp_text: !expr officer::fp_text_lite(bold = FALSE)
+    tables:
+      style: Table
+      layout: autofit
+      width: 1.0
+      topcaption: true
+      tab.lp: 'tab:'
+      caption:
+        style: Table Caption
+        pre: 'Table '
+        sep: '. '
+        tnd: 0
+        tns: '-'
+        fp_text: !expr officer::fp_text_lite(bold = FALSE)
+bibliography: bibliography.bib
+csl: council-of-science-editors-author-date.csl
+---
+
+```{r setup, include=FALSE}
+## load libraries
+library(officer)
+library(officedown)
+library(flextable)
+library(ragg)
+
+## this sets our default code chunk options
+knitr::opts_chunk$set(dev = "ragg_png",
+                      echo = FALSE,
+                      ## figure chunk options
+                      fig.cap = TRUE,
+                      fig.width = 6)
+
+## flextable defaults
+
+flextable::set_flextable_defaults(digits = 2)
+
+
+library(readxl)
+library(dplyr)
+library(tidyr)
+library(janitor)
+library(ggplot2)
+library(patchwork)
+
+
+
+
+df <- read_excel("../data/data.xlsx", col_types = c("text",
+    "text", "text", "text", "date", "text",
+    "text", "text", "text", "text", "text",
+    "text", "text", "text", "text", "text",
+    "text", "text", "text", "text", "text",
+    "text", "text", "text", "text", "text",
+    "text", "text", "text"))
+
+df <- df |> 
+  filter(tag != "K004989") |> 
+  pivot_longer(cols = "TEMPERATURE, WATER (DEGREES CENTIGRADE)":"SULFATE (MG/L AS SO4)") |> 
+  mutate(censor = case_when(
+    stringr::str_starts(value, "<") ~ "<",
+    stringr::str_starts(value, ">") ~ ">",
+    .default = NA
+  )) |> 
+  mutate(value = stringr::str_remove(value, "<")) |> 
+  mutate(value = stringr::str_remove(value, ">")) |> 
+  mutate(value = as.numeric(value))
+
+```
+
+
+Texas Water Resources Institute`r run_linebreak()`
+Texas A&M AgriLife`r run_linebreak()`
+College Station, TX
+
+TR-ABCD
+
+
+
+This project was funded through a grant from a generous agency.
+
+Insert other funding or partnership acknowledgments here.
+
+```{r}
+## leave in, starts new word document section
+## after table of abbreviations
+block_section(prop_section(type = "nextPage"))
+```
+
+::: {custom-style="Unnumbered Heading 1"}
+
+Table of Contents
+
+:::
+
+<!---BLOCK_TOC--->
+
+::: {custom-style="Unnumbered Heading 1"}
+
+Table of Figures
+
+:::
+
+<!---BLOCK_TOC{seq_id: 'fig'}--->
+
+::: {custom-style="Unnumbered Heading 1"}
+
+Table of Tables
+
+:::
+
+<!---BLOCK_TOC{seq_id: 'tab'}--->
+
+::: {custom-style="Unnumbered Heading 1"}
+
+Abbreviations
+
+:::
+
+
+
+
+```{r}
+## leave in, ends word document section
+## after table of abbreviations
+block_section(prop_section(type = "nextPage"))
+```
+
+# Introduction
+
+Work under this data collection project included water quality data collection 
+in Ayish Bayou and its tributaries for future watershed planning efforts.  
+Water quality data on the Ayish Bayou and its tributaries was collected to 
+provide improved temporal and spatial data resolution for future watershed 
+planning and assessment purposes. 
+Water quality monitoring was conducted monthly at monitoring stations 15361, 
+15365, 21431, 22399 on TCEQ Segment 0610A (Ayish Bayou), 15358 on 0610K 
+(Sandy Creek), 15359 on 0610I (Chiamon Creek), 15362 on 0610G (Caney Creek), 
+and 15363 on 0610M (Venado Creek). The 2022 Texas Integrated Report on
+Water Quality provides the following segment descriptions:
+
+- **0610A Ayish Bayou**: Perennial stream from the headwaters of Sam Rayburn 
+Reservoir to the dam impounding Bland Lake approximately 0.1km upstream of FM 
+1279 near the City of San Augustine.
+
+- **0610K Sandy Creek in San Augustine County**: From the confluence with Ayish 
+Bayou (0610A) upstream to headwaters in San Augustine County.
+
+- **0610I Chiamon Creek**: From the confluence with Ayish Bayou (0610A) in San 
+Augustine County upstream to headwaters in Sabine County.
+
+- **0610G Caney Creek in San Augustine County**: From the confluence with Ayish 
+Bayou (0610A) in San Augustine County upstream to headwaters.
+
+- **0610M Venado Creek**: From the confluence with Ayish Bayou (0610A) upstream 
+to headwaters in San Augustine County.
+
+Each water body is considered perennial with a "high" Aquatic Life Use designation.
+Ayish Bayou (0610A) has been identified as impaired in the 2022 Texas 
+Integrated Report of Water Quality for exceeding the primary 
+recreation use I criterion due to elevated *Escherichia coli* (*E. coli*) 
+and was first listed impaired in 2000.
+Focus of the monitoring activities were for bacterial impairments, but other
+water quality parameters were collected to provide further information for 
+planning efforts.
+Under this project sampling included collection of basic field parameters,
+conventional, and bacterialogical parameters. Sampling occurred monthly at all 
+sites; however, sites 15361 and 21431 on Ayish Bayou were sampled quarterly under
+the previously planned quarterly Clean Rivers Program monitoring efforts.
+Quarterly samples are not included in this report.
+All work was conducted under an approved Quality Assurance Project Plan.
+
+
+<!-- Insert map of sample sites -->
+<!-- Generate Summary of trips and dates -->
+
+# Data Summary
+
+<!-- Include tables and figures by parameter -->
+
+
+This is an example of an unformatted table and how we cross-reference that table ([Table \@ref(tab:summary)](#tab:summary)).
+
+<!---BLOCK_LANDSCAPE_START--->
+
+
+```{r message=FALSE, warning=FALSE, tab.cap='Summary', tab.id='summary'}
+params <- df |> 
+  distinct(name) |> 
+  filter(name != "E_COLI, COLILERT, IDEXX, HOLDING TIME") |>
+  filter(name != "DEPTH OF BOTTOM OF WATER BODY AT SAMPLE SITE MET") |> 
+  pull(name)
+## can we highlight cells that exceed critria?
+df |> 
+  filter(name %in% params) |> 
+  group_by(`Station Id`, `Station_Desc`, name) |> 
+  summarise(n = n(),
+            min = min(value),
+            max = max(value),
+            "Standard deviation" = round(sd(value),2),
+            mean = round(mean(value),2),
+            geomean = round(EnvStats::geoMean(value), 2)) |> 
+  mutate(center = case_when(
+    name == "E_ COLI, COLILERT, IDEXX METHOD, MPN/100ML" ~ geomean,
+    .default = mean)) |> 
+  ungroup() |> 
+  mutate("SWQM Site" = paste0(`Station Id`, " ", Station_Desc)) |> 
+  select(-c("mean", "geomean", "Station Id", "Station_Desc")) |> 
+  group_by(`SWQM Site`) |> 
+  flextable::as_grouped_data(groups = c("SWQM Site")) |> 
+  flextable::as_flextable() |> 
+  bold(j = 1, i = ~ !is.na(`SWQM Site`), bold = TRUE, part = "body") |> 
+  flextable::autofit() |>
+  style(j = 1, i = ~ !is.na(`SWQM Site`),
+        pr_p = fp_par(padding.right = 1.5)
+        ) |> 
+  ## this is a decimal tab
+  #tab_settings(j = 1, i = ~ !is.na(name), value = fp_tabs(fp_tab(pos = 0.5, style = "decimal")), part = "body") |> 
+  flextable::colformat_num(drop0trailing = TRUE) |> 
+  flextable::set_header_labels(name = "Parameter",
+                               min = "Minimum",
+                               max = "Maximum",
+                               center = "Center") |> 
+  footnote(i = 1, j = 6,
+           value = as_paragraph(as_chunk("Center refers to the geometric mean for "), 
+                                as_chunk("E. coli" , props = fp_text_default(italic = TRUE)),
+                                as_chunk(" and the mean for all other parameters.")),
+           ref_symbols = "a", part = "header")
+```
+
+<!---BLOCK_LANDSCAPE_STOP--->
+
+
+
+
+
+# Figures
+
+We can embed and cross-reference plots (Figure \@ref(fig:temperature)).
+
+```{r temperature, fig.cap="Temperature", fig.alt="Alternative text for screen readers", fig.width=6, fig.height=6, fig.dpi=200}
+p1 <- df |> 
+  filter(name %in% params[[1]]) |> 
+  ggplot() +
+  geom_boxplot(aes(x = `Station Id`, y = value)) +
+  geom_jitter(aes(x = `Station Id`, y = value), width = 0.1, alpha = 0.5) +
+  labs(y = params[[1]], x = "SWQM Station ID")
+  
+
+p2 <- df |> 
+  filter(name %in% params[[1]]) |> 
+  ggplot() +
+  geom_point(aes(x = Date, y = value, group = `Station Id`)) +
+  geom_line(aes(x = Date, y = value, group = `Station Id`), alpha = 0.5) +
+  facet_wrap(vars(`Station Id`)) +
+  labs(y = params[[1]], x = "Date")
+
+p1 / p2 + plot_annotation(tag_levels = "A") + plot_layout(axis_titles = "collect_y")
+
+## could just group by station id and not specify colors in the legend.
+## any outliers can be highlighted in future plots.
+
+  
+```
+
+
+```{r ph, fig.cap="pH", fig.alt="Alternative text for screen readers", fig.width=6, fig.height=6, fig.dpi=200}
+p1 <- df |> 
+  filter(name %in% params[[2]]) |> 
+  ggplot() +
+  geom_boxplot(aes(x = `Station Id`, y = value)) +
+  geom_jitter(aes(x = `Station Id`, y = value), width = 0.1, alpha = 0.5) +
+  labs(y = params[[2]], x = "SWQM Station ID")
+  
+
+p2 <- df |> 
+  filter(name %in% params[[2]]) |> 
+  ggplot() +
+  geom_point(aes(x = Date, y = value, group = `Station Id`)) +
+  geom_line(aes(x = Date, y = value, group = `Station Id`), alpha = 0.5) +
+  facet_wrap(vars(`Station Id`)) +
+  labs(y = params[[2]], x = "Date")
+
+p1 / p2 + plot_annotation(tag_levels = "A") + plot_layout(axis_titles = "collect_y")
+
+```
+
+```{r do, fig.cap="Grab Dissolved Oxygen samples by (A) station and by (B) date. Dissolved Oxygen grab minimum and screening level criterion are indicated by the solid and dashed lines.", fig.alt="Alternative text for screen readers", fig.width=6, fig.height=7.5, fig.dpi=200}
+p1 <- df |> 
+  filter(name %in% params[[3]]) |> 
+  ggplot() +
+  geom_boxplot(aes(x = `Station Id`, y = value)) +
+  geom_jitter(aes(x = `Station Id`, y = value), width = 0.1, alpha = 0.5) +
+  geom_hline(aes(yintercept = 5, linetype = "Dissolved Oxygen Grab Screening Level")) +
+  geom_hline(aes(yintercept = 3, linetype = "Dissolved Oxygen Grab Minimum")) +
+  scale_linetype("") +
+  labs(y = params[[3]], x = "SWQM Station ID") +
+  theme_bw()
+  
+
+p2 <- df |> 
+  filter(name %in% params[[3]]) |> 
+  ggplot() +
+  geom_point(aes(x = Date, y = value, group = `Station Id`)) +
+  #geom_line(aes(x = Date, y = value, group = `Station Id`), alpha = 0.5) +
+  geom_hline(aes(yintercept = 5, linetype = "Dissolved Oxygen Grab Screening Level")) +
+  geom_hline(aes(yintercept = 3, linetype = "Dissolved Oxygen Grab Minimum")) +
+  facet_wrap(vars(`Station Id`)) +
+  scale_linetype("") +
+  labs(y = params[[3]], x = "Date") +
+  theme_bw()
+
+p1 / p2 + plot_annotation(tag_levels = "A") + 
+  plot_layout(axis_titles = "collect_y", guides = "collect") &
+  theme(legend.position = "bottom")
+  
+```
+
+
+
+```{r sc, fig.cap="Specific conductance", fig.alt="Alternative text for screen readers"}
+p1 <- df |> 
+  filter(name %in% params[[4]]) |> 
+  ggplot() +
+  geom_boxplot(aes(x = `Station Id`, y = value)) +
+  geom_jitter(aes(x = `Station Id`, y = value), width = 0.1, alpha = 0.5) +
+  labs(y = params[[4]], x = "SWQM Station ID")
+  
+
+p2 <- df |> 
+  filter(name %in% params[[4]]) |> 
+  ggplot() +
+  geom_point(aes(x = Date, y = value, color = `Station Id`)) +
+  geom_line(aes(x = Date, y = value, color = `Station Id`), alpha = 0.5) +
+  labs(y = params[[4]], x = "Date")
+
+p1 / p2 + plot_annotation(tag_levels = "A") + plot_layout(axis_titles = "collect_y")
+  
+```
+
+
+
+
+```{r transparency, fig.cap="Transparency", fig.alt="Alternative text for screen readers"}
+p1 <- df |> 
+  filter(name %in% params[[5]]) |> 
+  ggplot() +
+  geom_boxplot(aes(x = `Station Id`, y = value)) +
+  geom_jitter(aes(x = `Station Id`, y = value), width = 0.1, alpha = 0.5) +
+  labs(y = params[[5]], x = "SWQM Station ID") +
+  theme_bw()
+  
+
+p2 <- df |> 
+  filter(name %in% params[[5]]) |> 
+  ggplot() +
+  geom_point(aes(x = Date, y = value, 
+                 color = `Station Id`, 
+                 shape = `Station Id`)) +
+  geom_line(aes(x = Date, y = value, 
+                color = `Station Id`), alpha = 0.5) +
+  labs(y = params[[5]], x = "Date") +
+  theme_bw()
+
+p1 / p2 + 
+  plot_annotation(tag_levels = "A") + 
+  plot_layout(axis_titles = "collect_y")
+  
+```
+
+
+```{r ecoli, fig.cap="Ecoli", fig.alt="Alternative text for screen readers"}
+p1 <- df |> 
+  filter(name %in% params[[6]]) |> 
+  ggplot() +
+  geom_boxplot(aes(x = `Station Id`, y = value)) +
+  geom_jitter(aes(x = `Station Id`, y = value), width = 0.1, alpha = 0.5) +
+  geom_hline(yintercept = 126) +
+  scale_y_log10() +
+  labs(y = params[[6]], x = "SWQM Station ID")
+  
+
+p2 <- df |> 
+  filter(name %in% params[[6]]) |> 
+  ggplot() +
+  geom_point(aes(x = Date, y = value, group = `Station Id`)) +
+  geom_line(aes(x = Date, y = value, group = `Station Id`), alpha = 0.5) +
+  geom_hline(yintercept = 126) +
+  scale_y_log10() +
+  labs(y = params[[6]], x = "Date")
+
+p1 / p2 + 
+  plot_annotation(tag_levels = "A") + 
+  plot_layout(axis_titles = "collect_y")
+  
+```
+
+
+
+
+
+
+
+```{r}
+## leave in, end word document section
+## after table of abbreviations
+block_section(prop_section(type = "nextPage"))
+```
+
+<!---BLOCK_LANDSCAPE_START--->
+
+# Landscape Section
+
+```{r, echo=FALSE, fig.cap='sin function', fig.id='sinus', fig.width=6, fig.height=4, fig.align='center'}
+x <- seq(1,30, by = .1)
+plot(x, sin(x), type = "l", main = "", xlab = "", ylab = "", col = "#CC4300")
+```
+
+<!---BLOCK_LANDSCAPE_STOP--->
+
+# Math
+
+Wrap variables or math in a single `$` to show math inline. For example, $\varepsilon \sim \mathrm{N}(0,1)$. Standalone equations are wrapped with `$$`.
+
+$$
+\left(\prod_{i=1}^{n}y_i\right)^{\frac{1}{n}} = \exp\left[\frac{1}{n}\sum_{i=1}^n\log{y_i}\right], \quad \textrm{when} \quad y_1, y_2, ..., y_n > 0
+$$
+
+If the equations need to be numbered and cross-referenced the format as:
+
+```tex
+\begin{equation}
+\left(\prod_{i=1}^{n}y_i\right)^{\frac{1}{n}} = \exp\left[\frac{1}{n}\sum_{i=1}^n\log{y_i}\right], \quad \textrm{when} \quad y_1, y_2, ..., y_n > 0
+(\#eq:gmean)
+\end{equation}
+```
+
+Which renders as (Equation \@ref(eq:gmean):
+
+\begin{equation}
+\left(\prod_{i=1}^{n}y_i\right)^{\frac{1}{n}} = \exp\left[\frac{1}{n}\sum_{i=1}^n\log{y_i}\right], \quad \textrm{when} \quad y_1, y_2, ..., y_n > 0
+(\#eq:gmean)
+\end{equation}
+
+# References
+
+In-text references and bibliography generation are handled automatically. It relies on creating a bibtex `.bib` file with your references. Software such as Zotero, Mendely, and even Google Scholar can generate the bibtex entries for you. The entries are stored in the `bibliography.bib` file inside the same directory as this `.Rmd` file. To make a in text citation, use the following syntax, `[@helsel_statistical_2002]` to generate the reference at the end of this sentence [@helsel_statistical_2002]. Use a semicolon to include multiple references `[@helsel_statistical_2002; @hirsch2010weighted]` [@helsel_statistical_2002; @hirsch2010weighted]. Or we might use `@helsel_statistical_2002` without brackets to indicate @helsel_statistical_2002 provide a fundamental overview of water quality statistics. The bibliography will populate automatically.
+
+# Styling and fonts
+
+This template uses Minion Pro for body fonts and Open Sans for headings following TWRI brand guidance and AgriLife brand guidance. I can't bundle Minion Pro in this package because of licensing, but you can download and install both fonts from AgriLife (https://agrilife.tamu.edu/wp-content/uploads/2021/03/AgriFonts.zip). I recommend downloading and installing the fonts before knitting your documents. Note that Minion Pro won't "embed" in Word documents because it is an OTF style font and currently Word only embeds TTF fonts. That means collaborators without the font installed on their system will see a different serif font on their system in Word. Once exported to pdf, both OTF and TTF fonts should be embedded correctly.
+
+```{r}
+## leave in, ends word document section
+block_section(prop_section(type = "nextPage"))
+```
+
+# Bibliography {-}
+
+<div id="refs"></div>
+
+```{r}
+## leave in, ends word document section
+## after table of abbreviations
+block_section(prop_section(type = "nextPage"))
+```
+
+
+
+# Appendix A {-}
+
+```{r}
+## leave in, ends word document section
+## after table of abbreviations
+block_section(prop_section(type = "nextPage"))
+```
+
+
+## Ayish Bayou 0610A
+
+<!---BLOCK_LANDSCAPE_START--->
+
+
+```{r}
+df |> 
+  filter(`Station Id` %in% c("22399", "15361", "21431", "15365")) |> 
+  select(`Station Id`, Station_Desc, Date, name, value, censor) |> 
+  mutate(value = case_when(
+    !is.na(censor) ~ stringr::str_c(censor, value),
+    is.na(censor) ~ paste0(value))
+    ) |> 
+  select(`Station Id`, Station_Desc, Date, name, value) |> 
+  filter(name %in% c("NITRITE NITROGEN, TOTAL (MG/L AS N)",
+                     "NITROGEN, AMMONIA, TOTAL (MG/L AS N)",
+                     "NITROGEN, KJELDAHL, TOTAL (MG/L AS N)",
+                     "RESIDUE, TOTAL NONFILTRABLE (MG/L)",
+                     "SULFATE (MG/L AS SO4)",
+                     "OXYGEN, DISSOLVED (MG/L)",
+                     "E_ COLI, COLILERT, IDEXX METHOD, MPN/100ML",
+                     "CHLORIDE (MG/L AS CL)",
+                     "NITRATE NITROGEN, TOTAL (MG/L AS N)",
+                     "PHOSPHORUS, TOTAL, WET METHOD (MG/L AS P)")) |> 
+  pivot_wider(names_from = name,
+              values_from = value) |> 
+  mutate(Date = as.Date(Date)) |> 
+  flextable::flextable() |> 
+  flextable::fontsize(size = 8, part = "all") |> 
+  flextable::bold(part = "header") |> 
+  flextable::align(j = c(4:13), align = "right", part = "all") |> 
+  flextable::set_header_labels(`Station Id` = "SWQM Station",
+                               Station_Desc = "Station Description",
+                               `E_ COLI, COLILERT, IDEXX METHOD, MPN/100ML` = "E. COLI, COLILERT, IDEXX METHOD (MPN/100ML)") |> 
+  flextable::padding(padding = 1, part = "all")
+```
+
+
+<!---BLOCK_LANDSCAPE_STOP--->
+
+
+##  CANEY BAYOU 0610G
+
+<!---BLOCK_LANDSCAPE_START--->
+
+```{r}
+df |> 
+  filter(`Station Id` %in% c("15362")) |> 
+  select(`Station Id`, Station_Desc, Date, name, value, censor) |> 
+  mutate(value = case_when(
+    !is.na(censor) ~ stringr::str_c(censor, value),
+    is.na(censor) ~ paste0(value))
+    ) |> 
+  select(`Station Id`, Station_Desc, Date, name, value) |> 
+  filter(name %in% c("NITRITE NITROGEN, TOTAL (MG/L AS N)",
+                     "NITROGEN, AMMONIA, TOTAL (MG/L AS N)",
+                     "NITROGEN, KJELDAHL, TOTAL (MG/L AS N)",
+                     "RESIDUE, TOTAL NONFILTRABLE (MG/L)",
+                     "SULFATE (MG/L AS SO4)",
+                     "OXYGEN, DISSOLVED (MG/L)",
+                     "E_ COLI, COLILERT, IDEXX METHOD, MPN/100ML",
+                     "CHLORIDE (MG/L AS CL)",
+                     "NITRATE NITROGEN, TOTAL (MG/L AS N)",
+                     "PHOSPHORUS, TOTAL, WET METHOD (MG/L AS P)")) |> 
+  pivot_wider(names_from = name,
+              values_from = value) |> 
+  mutate(Date = as.Date(Date)) |> 
+  flextable::flextable() |> 
+  flextable::fontsize(size = 8, part = "all") |> 
+  flextable::bold(part = "header") |> 
+  flextable::align(j = c(4:13), align = "right", part = "all") |> 
+  flextable::set_header_labels(`Station Id` = "SWQM Station",
+                               Station_Desc = "Station Description",
+                               `E_ COLI, COLILERT, IDEXX METHOD, MPN/100ML` = "E. COLI, COLILERT, IDEXX METHOD (MPN/100ML)") |> 
+  flextable::padding(padding = 1, part = "all")
+```
+
+<!---BLOCK_LANDSCAPE_STOP--->
+
+
+## CHIAMON BAYOU 0610I
+
+<!---BLOCK_LANDSCAPE_START--->
+
+```{r}
+df |> 
+  filter(`Station Id` %in% c("15359")) |> 
+  select(`Station Id`, Station_Desc, Date, name, value, censor) |> 
+  mutate(value = case_when(
+    !is.na(censor) ~ stringr::str_c(censor, value),
+    is.na(censor) ~ paste0(value))
+    ) |> 
+  select(`Station Id`, Station_Desc, Date, name, value) |> 
+  filter(name %in% c("NITRITE NITROGEN, TOTAL (MG/L AS N)",
+                     "NITROGEN, AMMONIA, TOTAL (MG/L AS N)",
+                     "NITROGEN, KJELDAHL, TOTAL (MG/L AS N)",
+                     "RESIDUE, TOTAL NONFILTRABLE (MG/L)",
+                     "SULFATE (MG/L AS SO4)",
+                     "OXYGEN, DISSOLVED (MG/L)",
+                     "E_ COLI, COLILERT, IDEXX METHOD, MPN/100ML",
+                     "CHLORIDE (MG/L AS CL)",
+                     "NITRATE NITROGEN, TOTAL (MG/L AS N)",
+                     "PHOSPHORUS, TOTAL, WET METHOD (MG/L AS P)")) |> 
+  pivot_wider(names_from = name,
+              values_from = value) |> 
+  mutate(Date = as.Date(Date)) |> 
+  flextable::flextable() |> 
+  flextable::fontsize(size = 8, part = "all") |> 
+  flextable::bold(part = "header") |> 
+  flextable::align(j = c(4:13), align = "right", part = "all") |> 
+  flextable::set_header_labels(`Station Id` = "SWQM Station",
+                               Station_Desc = "Station Description",
+                               `E_ COLI, COLILERT, IDEXX METHOD, MPN/100ML` = "E. COLI, COLILERT, IDEXX METHOD (MPN/100ML)") |> 
+  flextable::padding(padding = 1, part = "all")
+```
+
+<!---BLOCK_LANDSCAPE_STOP--->
+
+## SANDY CREEK 0610K
+
+<!---BLOCK_LANDSCAPE_START--->
+
+```{r}
+df |> 
+  filter(`Station Id` %in% c("15358")) |> 
+  select(`Station Id`, Station_Desc, Date, name, value, censor) |> 
+  mutate(value = case_when(
+    !is.na(censor) ~ stringr::str_c(censor, value),
+    is.na(censor) ~ paste0(value))
+    ) |> 
+  select(`Station Id`, Station_Desc, Date, name, value) |> 
+  filter(name %in% c("NITRITE NITROGEN, TOTAL (MG/L AS N)",
+                     "NITROGEN, AMMONIA, TOTAL (MG/L AS N)",
+                     "NITROGEN, KJELDAHL, TOTAL (MG/L AS N)",
+                     "RESIDUE, TOTAL NONFILTRABLE (MG/L)",
+                     "SULFATE (MG/L AS SO4)",
+                     "OXYGEN, DISSOLVED (MG/L)",
+                     "E_ COLI, COLILERT, IDEXX METHOD, MPN/100ML",
+                     "CHLORIDE (MG/L AS CL)",
+                     "NITRATE NITROGEN, TOTAL (MG/L AS N)",
+                     "PHOSPHORUS, TOTAL, WET METHOD (MG/L AS P)")) |> 
+  pivot_wider(names_from = name,
+              values_from = value) |> 
+  mutate(Date = as.Date(Date)) |> 
+  flextable::flextable() |> 
+  flextable::fontsize(size = 8, part = "all") |> 
+  flextable::bold(part = "header") |> 
+  flextable::align(j = c(4:13), align = "right", part = "all") |> 
+  flextable::set_header_labels(`Station Id` = "SWQM Station",
+                               Station_Desc = "Station Description",
+                               `E_ COLI, COLILERT, IDEXX METHOD, MPN/100ML` = "E. COLI, COLILERT, IDEXX METHOD (MPN/100ML)") |> 
+  flextable::padding(padding = 1, part = "all")
+```
+
+<!---BLOCK_LANDSCAPE_STOP--->
+
+## Venado Creek 0610M
+
+<!---BLOCK_LANDSCAPE_START--->
+
+```{r}
+df |> 
+  filter(`Station Id` %in% c("15363")) |> 
+  select(`Station Id`, Station_Desc, Date, name, value, censor) |> 
+  mutate(value = case_when(
+    !is.na(censor) ~ stringr::str_c(censor, value),
+    is.na(censor) ~ paste0(value))
+    ) |> 
+  select(`Station Id`, Station_Desc, Date, name, value) |> 
+  filter(name %in% c("NITRITE NITROGEN, TOTAL (MG/L AS N)",
+                     "NITROGEN, AMMONIA, TOTAL (MG/L AS N)",
+                     "NITROGEN, KJELDAHL, TOTAL (MG/L AS N)",
+                     "RESIDUE, TOTAL NONFILTRABLE (MG/L)",
+                     "SULFATE (MG/L AS SO4)",
+                     "OXYGEN, DISSOLVED (MG/L)",
+                     "E_ COLI, COLILERT, IDEXX METHOD, MPN/100ML",
+                     "CHLORIDE (MG/L AS CL)",
+                     "NITRATE NITROGEN, TOTAL (MG/L AS N)",
+                     "PHOSPHORUS, TOTAL, WET METHOD (MG/L AS P)")) |> 
+  pivot_wider(names_from = name,
+              values_from = value) |> 
+  mutate(Date = as.Date(Date)) |> 
+  flextable::flextable() |> 
+  flextable::fontsize(size = 8, part = "all") |> 
+  flextable::bold(part = "header") |> 
+  flextable::align(j = c(4:13), align = "right", part = "all") |> 
+  flextable::set_header_labels(`Station Id` = "SWQM Station",
+                               Station_Desc = "Station Description",
+                               `E_ COLI, COLILERT, IDEXX METHOD, MPN/100ML` = "E. COLI, COLILERT, IDEXX METHOD (MPN/100ML)") |> 
+  flextable::padding(padding = 1, part = "all")
+```
+
+<!---BLOCK_LANDSCAPE_STOP--->
+
