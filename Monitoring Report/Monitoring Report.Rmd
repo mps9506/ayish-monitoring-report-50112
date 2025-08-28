@@ -194,15 +194,13 @@ All work was conducted under an approved Quality Assurance Project Plan.
 
 # Data Summary
 
-[Table \@ref(tab:summary)](#tab:summary) provides a a summary of the number of
+Table \@ref(tab:summary) provides a  summary of the number of
 samples (n), minimum, maximum, standard deviation, and measure of central tendency
 for conventional, bacteria, and certain field parameters by site. 
 Geometric means are reported for *E. coli* and means are reported for all 
 other parameters. 
 Full data records for field, conventional, and bacteriological from 
-all sites are listed by segment in Appendix A ([Table \@ref(tab:ayish)](#tab:ayish),
-[Table \@ref(tab:caney)](#tab:caney), [Table \@ref(tab:chiamon)](#tab:chiamon),
-[Table \@ref(tab:venado)](#tab:venado)).
+all sites are listed by segment in Appendix A (Tables \@ref(tab:ayishfield)-\@ref(tab:venado)).
 
 
 <!---BLOCK_LANDSCAPE_START--->
@@ -238,6 +236,8 @@ df |>
   style(j = 1, i = ~ !is.na(`SWQM Site`),
         pr_p = fp_par(padding.right = 1.5)
         ) |> 
+  flextable::fontsize(size = 9, part = "all") |> 
+  flextable::bold(part = "header") |> 
   ## this is a decimal tab
   #tab_settings(j = 1, i = ~ !is.na(name), value = fp_tabs(fp_tab(pos = 0.5, style = "decimal")), part = "body") |> 
   flextable::colformat_num(drop0trailing = TRUE) |> 
@@ -245,10 +245,11 @@ df |>
                                min = "Minimum",
                                max = "Maximum",
                                center = "Center") |> 
+  flextable::padding(padding = 1, part = "all") |> 
   footnote(i = 1, j = 6,
-           value = as_paragraph(as_chunk("Center refers to the geometric mean for "), 
-                                as_chunk("E. coli" , props = fp_text_default(italic = TRUE)),
-                                as_chunk(" and the mean for all other parameters.")),
+           value = as_paragraph(as_chunk("Center refers to the geometric mean for ", props = fp_text_default(font.size = 9)), 
+                                as_chunk("E. coli" , props = fp_text_default(italic = TRUE, font.size = 9)),
+                                as_chunk(" and the mean for all other parameters.", props = fp_text_default(font.size = 9))),
            ref_symbols = "a", part = "header")
 ```
 
@@ -349,7 +350,7 @@ p1 / p2 +
 
 
 
-```{r nitrate, fig.cap="Grab Nitrate-Nitrogen samples by (A) station and by (B) date. The 1.95 mg/L screening level is indicated by the dashed line. Censored values are less than the laboratory level of quantificaton.", fig.alt="Alternative text for screen readers", fig.width=6, fig.height=8, fig.dpi=200}
+```{r nitrate, fig.cap="Grab Nitrate-Nitrogen samples by (A) station and by (B) date. The 1.95 mg/L screening level is indicated by the dashed line. Censored values are less than the laboratory level of quantification.", fig.alt="Alternative text for screen readers", fig.width=6, fig.height=8, fig.dpi=200}
 p1 <- df |> 
   filter(name %in% params[[8]]) |> 
   ggplot() +
@@ -382,7 +383,7 @@ p1 / p2 +
   
 ```
 
-```{r nitrite, fig.cap="Grab Nitrite-Nitrogen samples by (A) station and by (B) date. Censored values are less than the laboratory level of quantificaton.", fig.alt="Alternative text for screen readers", fig.width=6, fig.height=8, fig.dpi=200}
+```{r nitrite, fig.cap="Grab Nitrite-Nitrogen samples by (A) station and by (B) date. Censored values are less than the laboratory level of quantification.", fig.alt="Alternative text for screen readers", fig.width=6, fig.height=8, fig.dpi=200}
 p1 <- df |> 
   filter(name %in% params[[9]]) |> 
   ggplot() +
@@ -418,7 +419,7 @@ p1 / p2 +
 ```
 
 
-```{r ammonia, fig.cap="Grab Nitrogen-Ammonia samples by (A) station and by (B) date. Censored values are less than the laboratory level of quantificaton.", fig.alt="Alternative text for screen readers", fig.width=6, fig.height=8, fig.dpi=200}
+```{r ammonia, fig.cap="Grab Nitrogen-Ammonia samples by (A) station and by (B) date. Censored values are less than the laboratory level of quantification.", fig.alt="Alternative text for screen readers", fig.width=6, fig.height=8, fig.dpi=200}
 p1 <- df |> 
   filter(name %in% params[[10]]) |> 
   ggplot() +
@@ -454,7 +455,7 @@ p1 / p2 +
 ```
 
 
-```{r kjeldahl, fig.cap="Grab Nitrogen-Kjeldahl samples by (A) station and by (B) date. Censored values are less than the laboratory level of quantificaton.", fig.alt="Alternative text for screen readers", fig.width=6, fig.height=8, fig.dpi=200}
+```{r kjeldahl, fig.cap="Grab Nitrogen-Kjeldahl samples by (A) station and by (B) date. Censored values are less than the laboratory level of quantification.", fig.alt="Alternative text for screen readers", fig.width=6, fig.height=8, fig.dpi=200}
 p1 <- df |> 
   filter(name %in% params[[11]]) |> 
   ggplot() +
@@ -490,7 +491,7 @@ p1 / p2 +
 ```
 
 
-```{r tp, fig.cap="Grab Total Phosphorus samples by (A) station and by (B) date. The dotted line indicates the 0.69 mg/L screening level. Censored values are less than the laboratory level of quantificaton.", fig.alt="Alternative text for screen readers", fig.width=6, fig.height=8, fig.dpi=200}
+```{r tp, fig.cap="Grab Total Phosphorus samples by (A) station and by (B) date. The dotted line indicates the 0.69 mg/L screening level. Censored values are less than the laboratory level of quantification.", fig.alt="Alternative text for screen readers", fig.width=6, fig.height=8, fig.dpi=200}
 p1 <- df |> 
   filter(name %in% params[[12]]) |> 
   ggplot() +
@@ -526,16 +527,53 @@ p1 / p2 +
 ```
 
 
-```{r}
+```{r flow, fig.cap=" (A) Histogram of total distribution of all instantaneous streamflow measurements and (B) instantaneous streamflow measurements by date and station.", fig.alt="Alternative text for screen readers", fig.width=6, fig.height=8, fig.dpi=200}
 
-##3 need to remove <, and sub estimate when available
-df |> 
-  distinct(tag, `Station Id`, `FLOW  STREAM, INSTANTANEOUS (CUBIC FEET PER SEC)`, Date) |>
-  mutate(Flow = as.numeric(`FLOW  STREAM, INSTANTANEOUS (CUBIC FEET PER SEC)`)) |> 
+
+p1 <- df |> 
+  select(tag, `Station Id`, `FLOW MTH 1=GAGE 2=ELEC 3=MECH 4=WEIR/FLU 5=DOPPL`, `FLOW  STREAM, INSTANTANEOUS (CUBIC FEET PER SEC)`, `STREAM FLOW ESTIMATE (CFS)`, Date) |> 
+  mutate(Flow = case_when(
+    is.na(`FLOW  STREAM, INSTANTANEOUS (CUBIC FEET PER SEC)`) ~ `STREAM FLOW ESTIMATE (CFS)`,
+    !is.na(`FLOW  STREAM, INSTANTANEOUS (CUBIC FEET PER SEC)`) ~ stringr::str_remove(`FLOW  STREAM, INSTANTANEOUS (CUBIC FEET PER SEC)`, "<"),
+    .default = `FLOW  STREAM, INSTANTANEOUS (CUBIC FEET PER SEC)`
+  )) |> 
+  mutate(Flow = as.numeric(Flow)) |> 
+  distinct(tag, `Station Id`, Date, Flow) |> 
   ggplot() + 
   geom_histogram(aes(Flow), bins = 50) +
-  scale_x_log10(labels = scales::label_comma()) +
+  scale_x_continuous("Instantaneous Streamflow (cfs)",
+                     labels = scales::label_comma(),
+                     transform = "pseudo_log",
+                     breaks = c(0,1,5,10,50,100,500,1000),
+                     minor_breaks = c(2,3,4,6,7,8,9,20,30,40,60,70,80,90,200,300,400,600,700,800,900)) +
   theme_bw()
+
+
+
+p2 <- df |> 
+  select(tag, `Station Id`, `FLOW MTH 1=GAGE 2=ELEC 3=MECH 4=WEIR/FLU 5=DOPPL`, `FLOW  STREAM, INSTANTANEOUS (CUBIC FEET PER SEC)`, `STREAM FLOW ESTIMATE (CFS)`, Date) |> 
+  mutate(Flow = case_when(
+    is.na(`FLOW  STREAM, INSTANTANEOUS (CUBIC FEET PER SEC)`) ~ `STREAM FLOW ESTIMATE (CFS)`,
+    !is.na(`FLOW  STREAM, INSTANTANEOUS (CUBIC FEET PER SEC)`) ~ stringr::str_remove(`FLOW  STREAM, INSTANTANEOUS (CUBIC FEET PER SEC)`, "<"),
+    .default = `FLOW  STREAM, INSTANTANEOUS (CUBIC FEET PER SEC)`
+  )) |> 
+  mutate(Flow = as.numeric(Flow)) |> 
+  distinct(tag, `Station Id`, Date, Flow) |> 
+  ggplot() +
+  geom_point(aes(Date, Flow)) +
+  facet_wrap(vars(`Station Id`)) +
+  scale_y_continuous("Instantaneous Streamflow (cfs)",
+                     labels = scales::label_comma(),
+                     transform = "pseudo_log",
+                     breaks = c(0,1,10,100,1000),
+                     minor_breaks = c(2,3,4,5,6,7,8,9,20,30,40,50,60,70,80,90,200,300,400,500,600,700,800,900)) +
+  theme_bw()
+
+p1 / p2 +
+  plot_annotation(tag_levels = "A") + 
+  plot_layout(axis_titles = "collect_y", guides = "collect") &
+  theme(legend.position = "bottom")
+
 ```
 
 
@@ -575,8 +613,34 @@ block_section(prop_section(type = "nextPage"))
 
 <!---BLOCK_LANDSCAPE_START--->
 
+```{r ayishfield, tab.cap="Select field parameter measurements for Ayish Bayou Segment 0610A.", tab.id="ayishfield"}
 
-```{r ayish, tab.cap="Data records for Ayish Bayou Segment 0610A.", tab.id="ayish"}
+
+df_field <- read_excel("../data/data.xlsx", col_types = c("text",
+    "text", "text", "text", "date", "text",
+    "text", "text", "text", "text", "text",
+    "text", "text", "text", "text", "text",
+    "text", "text", "text", "text", "text",
+    "text", "text", "text", "text", "text",
+    "text", "text", "text"))
+
+df_field |> 
+  filter(`Station Id` %in% c("22399", "15361", "21431", "15365")) |> 
+  mutate(Date = as.Date(Date)) |> 
+  select(tag, `Station Id`, Station_Desc, Date, `FLOW MTH 1=GAGE 2=ELEC 3=MECH 4=WEIR/FLU 5=DOPPL`, `FLOW  STREAM, INSTANTANEOUS (CUBIC FEET PER SEC)`, `FLOW:1=No Flow,2=Low,3=Normal,4=Flood,5=High,6=Dry`, `STREAM FLOW ESTIMATE (CFS)`, `DAYS SINCE PRECIPITATION EVENT (DAYS)`, `TEMPERATURE, WATER (DEGREES CENTIGRADE)`, `PH (STANDARD UNITS)`, `SPECIFIC CONDUCTANCE,FIELD (UMHOS/CM @ 25C)`, `TRANSPARENCY, SECCHI DISC (METERS)`) |> 
+  flextable::flextable() |> 
+  flextable::fontsize(size = 8, part = "all") |> 
+  flextable::bold(part = "header") |> 
+  flextable::align(j = c(4:13), align = "right", part = "all") |> 
+  flextable::set_header_labels(tag = "Tag ID",
+                               `Station Id` = "SWQM Station",
+                               Station_Desc = "Station Description") |> 
+  flextable::padding(padding = 1, part = "all")
+```
+
+`r run_pagebreak()`
+
+```{r ayish, tab.cap="Conventional and bacteria data for Ayish Bayou Segment 0610A.", tab.id="ayish"}
 df |> 
   filter(`Station Id` %in% c("22399", "15361", "21431", "15365")) |> 
   select(tag, `Station Id`, Station_Desc, Date, name, value, censor) |> 
@@ -616,6 +680,25 @@ df |>
 ##  Caney Creek 0610G Data
 
 <!---BLOCK_LANDSCAPE_START--->
+
+```{r caneyfield, tab.cap="Select field parameter measurements for Caney Creek Segment 0610G.", tab.id="caneyfield"}
+
+
+df_field |> 
+  filter(`Station Id` %in% c("15362")) |> 
+  mutate(Date = as.Date(Date)) |> 
+  select(tag, `Station Id`, Station_Desc, Date, `FLOW MTH 1=GAGE 2=ELEC 3=MECH 4=WEIR/FLU 5=DOPPL`, `FLOW  STREAM, INSTANTANEOUS (CUBIC FEET PER SEC)`, `FLOW:1=No Flow,2=Low,3=Normal,4=Flood,5=High,6=Dry`, `STREAM FLOW ESTIMATE (CFS)`, `DAYS SINCE PRECIPITATION EVENT (DAYS)`, `TEMPERATURE, WATER (DEGREES CENTIGRADE)`, `PH (STANDARD UNITS)`, `SPECIFIC CONDUCTANCE,FIELD (UMHOS/CM @ 25C)`, `TRANSPARENCY, SECCHI DISC (METERS)`) |> 
+  flextable::flextable() |> 
+  flextable::fontsize(size = 8, part = "all") |> 
+  flextable::bold(part = "header") |> 
+  flextable::align(j = c(4:13), align = "right", part = "all") |> 
+  flextable::set_header_labels(tag = "Tag ID",
+                               `Station Id` = "SWQM Station",
+                               Station_Desc = "Station Description") |> 
+  flextable::padding(padding = 1, part = "all")
+```
+
+`r run_pagebreak()`
 
 ```{r caney, tab.cap="Data records for Caney Creek Segment 0610G.", tab.id="caney"}
 df |> 
@@ -657,6 +740,25 @@ df |>
 
 <!---BLOCK_LANDSCAPE_START--->
 
+```{r chiamonfield, tab.cap="Select field parameter measurements for Chiamon Bayou Segment 0610I.", tab.id="chiamonfield"}
+
+
+df_field |> 
+  filter(`Station Id` %in% c("15359")) |> 
+  mutate(Date = as.Date(Date)) |> 
+  select(tag, `Station Id`, Station_Desc, Date, `FLOW MTH 1=GAGE 2=ELEC 3=MECH 4=WEIR/FLU 5=DOPPL`, `FLOW  STREAM, INSTANTANEOUS (CUBIC FEET PER SEC)`, `FLOW:1=No Flow,2=Low,3=Normal,4=Flood,5=High,6=Dry`, `STREAM FLOW ESTIMATE (CFS)`, `DAYS SINCE PRECIPITATION EVENT (DAYS)`, `TEMPERATURE, WATER (DEGREES CENTIGRADE)`, `PH (STANDARD UNITS)`, `SPECIFIC CONDUCTANCE,FIELD (UMHOS/CM @ 25C)`, `TRANSPARENCY, SECCHI DISC (METERS)`) |> 
+  flextable::flextable() |> 
+  flextable::fontsize(size = 8, part = "all") |> 
+  flextable::bold(part = "header") |> 
+  flextable::align(j = c(4:13), align = "right", part = "all") |> 
+  flextable::set_header_labels(tag = "Tag ID",
+                               `Station Id` = "SWQM Station",
+                               Station_Desc = "Station Description") |> 
+  flextable::padding(padding = 1, part = "all")
+```
+
+`r run_pagebreak()`
+
 ```{r chiamon, tab.cap="Data records for Chiamon Bayou Segment 0610I.", tab.id="chiamon"}
 df |> 
   filter(`Station Id` %in% c("15359")) |> 
@@ -695,6 +797,24 @@ df |>
 ## Sandy Creek 0610K Data
 
 <!---BLOCK_LANDSCAPE_START--->
+```{r sandyfield, tab.cap="Select field parameter measurements for Sandy Creek Segment 0610K.", tab.id="sandyfield"}
+
+
+df_field |> 
+  filter(`Station Id` %in% c("15358")) |> 
+  mutate(Date = as.Date(Date)) |> 
+  select(tag, `Station Id`, Station_Desc, Date, `FLOW MTH 1=GAGE 2=ELEC 3=MECH 4=WEIR/FLU 5=DOPPL`, `FLOW  STREAM, INSTANTANEOUS (CUBIC FEET PER SEC)`, `FLOW:1=No Flow,2=Low,3=Normal,4=Flood,5=High,6=Dry`, `STREAM FLOW ESTIMATE (CFS)`, `DAYS SINCE PRECIPITATION EVENT (DAYS)`, `TEMPERATURE, WATER (DEGREES CENTIGRADE)`, `PH (STANDARD UNITS)`, `SPECIFIC CONDUCTANCE,FIELD (UMHOS/CM @ 25C)`, `TRANSPARENCY, SECCHI DISC (METERS)`) |> 
+  flextable::flextable() |> 
+  flextable::fontsize(size = 8, part = "all") |> 
+  flextable::bold(part = "header") |> 
+  flextable::align(j = c(4:13), align = "right", part = "all") |> 
+  flextable::set_header_labels(tag = "Tag ID",
+                               `Station Id` = "SWQM Station",
+                               Station_Desc = "Station Description") |> 
+  flextable::padding(padding = 1, part = "all")
+```
+
+`r run_pagebreak()`
 
 ```{r sandy, tab.cap="Data records for Sandy Creek Segment 0610K.", tab.id="sandy"}
 df |> 
@@ -734,6 +854,26 @@ df |>
 ## Venado Creek 0610M Data
 
 <!---BLOCK_LANDSCAPE_START--->
+
+
+```{r venadofield, tab.cap="Select field parameter measurements for Venado Creek Segment 0610M.", tab.id="venadofield"}
+
+
+df_field |> 
+  filter(`Station Id` %in% c("15363")) |> 
+  mutate(Date = as.Date(Date)) |> 
+  select(tag, `Station Id`, Station_Desc, Date, `FLOW MTH 1=GAGE 2=ELEC 3=MECH 4=WEIR/FLU 5=DOPPL`, `FLOW  STREAM, INSTANTANEOUS (CUBIC FEET PER SEC)`, `FLOW:1=No Flow,2=Low,3=Normal,4=Flood,5=High,6=Dry`, `STREAM FLOW ESTIMATE (CFS)`, `DAYS SINCE PRECIPITATION EVENT (DAYS)`, `TEMPERATURE, WATER (DEGREES CENTIGRADE)`, `PH (STANDARD UNITS)`, `SPECIFIC CONDUCTANCE,FIELD (UMHOS/CM @ 25C)`, `TRANSPARENCY, SECCHI DISC (METERS)`) |> 
+  flextable::flextable() |> 
+  flextable::fontsize(size = 8, part = "all") |> 
+  flextable::bold(part = "header") |> 
+  flextable::align(j = c(4:13), align = "right", part = "all") |> 
+  flextable::set_header_labels(tag = "Tag ID",
+                               `Station Id` = "SWQM Station",
+                               Station_Desc = "Station Description") |> 
+  flextable::padding(padding = 1, part = "all")
+```
+
+`r run_pagebreak()`
 
 ```{r venado, tab.cap="Data records for Venado Creek Segment 0610M.", tab.id="venado"}
 df |> 
