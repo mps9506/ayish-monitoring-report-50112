@@ -130,17 +130,18 @@ Table of Tables
 
 <!---BLOCK_TOC{seq_id: 'tab'}--->
 
-::: {custom-style="Unnumbered Heading 1"}
-
-Abbreviations
-
-:::
 
 
 ```{r}
 ## leave in, ends word document section
-## after table of abbreviations
-block_section(prop_section(type = "nextPage"))
+block_section(
+  prop_section(type = "nextPage", 
+               footer_default = block_list(
+                 fpar(run_word_field(field = "PAGE \\* roman"),
+                      fp_p = fp_par(text.align = "center"))
+                 )
+               )
+  )
 ```
 
 
@@ -154,8 +155,8 @@ planning and assessment purposes.
 Water quality monitoring was conducted monthly at monitoring stations 15361, 
 15365, 21431, 22399 on TCEQ Segment 0610A (Ayish Bayou), 15358 on 0610K 
 (Sandy Creek), 15359 on 0610I (Chiamon Creek), 15362 on 0610G (Caney Creek), 
-and 15363 on 0610M (Venado Creek). The 2022 Texas Integrated Report on
-Water Quality provides the following segment descriptions:
+and 15363 on 0610M (Venado Creek; Figure \@ref(fig:map)). The *2022 Texas Integrated Report of
+Surface Water Quality* provides the following segment descriptions [@tceq2022TexasIntegrated2022]:
 
 - **0610A Ayish Bayou**: Perennial stream from the headwaters of Sam Rayburn 
 Reservoir to the dam impounding Bland Lake approximately 0.1km upstream of FM 
@@ -173,14 +174,16 @@ Bayou (0610A) in San Augustine County upstream to headwaters.
 - **0610M Venado Creek**: From the confluence with Ayish Bayou (0610A) upstream 
 to headwaters in San Augustine County.
 
-Each water body is considered perennial with a "high" Aquatic Life Use designation.
-Ayish Bayou (0610A) has been identified as impaired in the *2022 Texas 
-Integrated Report of Water Quality* for exceeding the primary 
+These water bodies are considered perennial with a "high" Aquatic Life Use designation.
+Ayish Bayou (0610A) was identified as impaired in the *2022 Texas 
+Integrated Report of Surface Water Quality* for exceeding the primary 
 recreation use I criterion due to elevated *Escherichia coli* (*E. coli*) 
-and was first listed impaired in 2000.
+and was first listed impaired in 2000 [@tceq2022TexasIntegrated2022].
 Focus of the monitoring project was for bacterial impairments, but other
 water quality parameters were collected to provide further information for 
 planning efforts.
+Sites were selected to characterize potential upstream to downstream
+spatial variability and based on safe publicly accessible sampling locations.
 Under this project sampling included collection of basic field parameters,
 conventional, and bacteriological parameters. Sampling occurred monthly at all 
 sites; however, sites 15361 and 21431 on Ayish Bayou were sampled quarterly under
@@ -190,6 +193,10 @@ All work was conducted under an approved Quality Assurance Project Plan.
 
 
 <!-- Insert map of sample sites -->
+```{r map, fig.width=645/96*0.95, fig.height=834/96*0.95, dpi=96, fig.cap="Map of Ayish Bayou watershed, segments, and monitoring stations."}
+knitr::include_graphics("../figures/map.png")
+```
+
 <!-- Generate Summary of trips and dates -->
 
 # Data Summary
@@ -202,11 +209,24 @@ other parameters.
 Full data records for field, conventional, and bacteriological from 
 all sites are listed by segment in Appendix A (Tables \@ref(tab:ayishfield)-\@ref(tab:venado)).
 
+```{r}
+## leave in, ends word document section
+block_section(
+  prop_section(type = "nextPage", 
+               footer_default = block_list(
+                 fpar(run_word_field(field = "PAGE \\* ARABIC"),
+                      fp_p = fp_par(text.align = "center"))
+                 )
+               )
+  )
+```
 
-<!---BLOCK_LANDSCAPE_START--->
 
 
-```{r message=FALSE, warning=FALSE, tab.cap='Summary', tab.id='summary'}
+
+
+```{r message=FALSE, warning=FALSE, tab.cap='Summary of conventional, bacteria, and field samples collected during the project.', tab.id='summary'}
+
 params <- df |> 
   distinct(name) |> 
   filter(name != "E_COLI, COLILERT, IDEXX, HOLDING TIME") |>
@@ -228,6 +248,11 @@ df |>
   ungroup() |> 
   mutate("SWQM Site" = paste0(`Station Id`, " ", Station_Desc)) |> 
   select(-c("mean", "geomean", "Station Id", "Station_Desc")) |> 
+  mutate(name = case_when(
+    name == "E_ COLI, COLILERT, IDEXX METHOD, MPN/100ML" ~ "E. COLI, COLILERT, IDEXX METHOD (MPN/100ML)",
+    name == "SPECIFIC CONDUCTANCE,FIELD (UMHOS/CM @ 25C)" ~ "SPECIFIC CONDUCTANCE, FIELD (UMHOS/CM @ 25C)",
+    .default = name
+  )) |> 
   group_by(`SWQM Site`) |> 
   flextable::as_grouped_data(groups = c("SWQM Site")) |> 
   flextable::as_flextable() |> 
@@ -253,7 +278,18 @@ df |>
            ref_symbols = "a", part = "header")
 ```
 
-<!---BLOCK_LANDSCAPE_STOP--->
+```{r}
+block_section(
+  prop_section(
+    page_size = page_size(orient = "landscape"),
+    type = "nextPage",
+    footer_default = block_list(
+                 fpar(run_word_field(field = "PAGE \\* ARABIC"),
+                      fp_p = fp_par(text.align = "center"))
+                 )
+  )
+)
+```
 
 <!-- Water quality monitoring was conducted monthly at monitoring stations 15361,  -->
 <!-- 15365, 21431, 22399 on TCEQ Segment 0610A (Ayish Bayou), 15358 on 0610K  -->
@@ -274,10 +310,15 @@ concentrations above the primary recreation I criteria of 126 MPN/100 mL
 the screening level across all stations (Figures \@ref(fig:nitrate); \@ref(fig:tp)).
 Nearly all of the nitrite-nitrogen and ammonia samples were below laboratory
 limits of quantification (Figures \@ref(fig:nitrite); \@ref(fig:ammonia)).
+Across all sites, streamflow variability ranged from zero flow to 720 cubic 
+feet per second (Figures \@ref(fig:flow)). The largest instantaneous flow values 
+were measured along the mainstem of Ayish Bayou and appears to have sustained
+flows through the year. Chiamon Creek, Caney Creek, and Sandy Creek all had 
+periods of zero-streamflow.
 
 
 
-```{r do, fig.cap="Grab Dissolved Oxygen samples by (A) station and by (B) date. Dissolved Oxygen grab minimum and screening level criterion are indicated by the solid and dashed lines.", fig.alt="Alternative text for screen readers", fig.width=6, fig.height=8, fig.dpi=200}
+```{r do, fig.cap="Grab dissolved oxygen samples by (A) station and by (B) date. Dissolved oxygen grab minimum and screening level criterion are indicated by the solid and dashed lines.", fig.alt="Alternative text for screen readers", fig.width=6, fig.height=8, fig.dpi=200}
 p1 <- df |> 
   filter(name %in% params[[3]]) |> 
   ggplot() +
@@ -313,9 +354,13 @@ p1 / p2 + plot_annotation(tag_levels = "A") +
 
 
 
-```{r ecoli, fig.cap="Grab E. coli samples by (A) station and by (B) date. Seven-year geometric mean and single sample criterion are indicated by the solid and dashed lines. Censored values are greater than the laboratory reported level of quantification.", fig.alt="Alternative text for screen readers", fig.width=6, fig.height=8, fig.dpi=200}
+```{r fig.alt="Alternative text for screen readers", fig.width=6, fig.height=8.25, fig.dpi=200}
 p1 <- df |> 
   filter(name %in% params[[6]]) |> 
+  mutate(name = case_when(
+    name == "E_ COLI, COLILERT, IDEXX METHOD, MPN/100ML" ~ "E. COLI, COLILERT, IDEXX METHOD (MPN/100ML)",
+    .default = name
+  )) |> 
   ggplot() +
   geom_boxplot(aes(x = `Station Id`, y = value), outliers = FALSE) +
   geom_jitter(aes(x = `Station Id`, y = value, color = censor), width = 0.1, height = 0, alpha = 0.5) +
@@ -324,7 +369,7 @@ p1 <- df |>
   scale_y_log10() +
   scale_color_grey("", labels = c("Right-censored (>)", "Lab-reported value"), na.value = "dodgerblue") +
   scale_linetype_manual("", values= c(1,2)) +
-  labs(y = params[[6]], x = "SWQM Station ID") +
+  labs(y = "E. COLI, COLILERT, IDEXX METHOD (MPN/100ML)", x = "SWQM Station ID") +
   theme_bw()
   
 
@@ -338,19 +383,23 @@ p2 <- df |>
   scale_y_log10() +
   scale_color_grey("", labels = c("Right-censored (>)", "Lab-reported value"), na.value = "dodgerblue") +
   scale_linetype_manual("", values= c(1,2)) +
-  labs(y = params[[6]], x = "Date") +
+  labs(y = "E. COLI, COLILERT, IDEXX METHOD (MPN/100ML)", x = "Date") +
   theme_bw()
 
 p1 / p2 + 
   plot_annotation(tag_levels = "A") + 
   plot_layout(axis_titles = "collect_y", guides = "collect") &
-  theme(legend.position = "bottom")
+  theme(legend.position = "bottom",
+        legend.direction = "vertical")
   
 ```
 
+<caption>
+`r fpar(run_autonum(seq_id = 'fig', bkm = 'ecoli', pre_label = "Figure "), ftext("Grab "), ftext("E. coli", prop = fp_text_lite(italic = TRUE)), ftext(" samples by (A) station and by (B) date. Seven-year geometric mean and single sample criterion are indicated by the solid and dashed lines. Censored values are greater than the laboratory reported level of quantification."), fp_p = fp_par_lite(word_style = "Image Caption"))`
+</caption>
 
 
-```{r nitrate, fig.cap="Grab Nitrate-Nitrogen samples by (A) station and by (B) date. The 1.95 mg/L screening level is indicated by the dashed line. Censored values are less than the laboratory level of quantification.", fig.alt="Alternative text for screen readers", fig.width=6, fig.height=8, fig.dpi=200}
+```{r nitrate, fig.cap="Grab nitrate-nitrogen samples by (A) station and by (B) date. The 1.95 mg/L screening level is indicated by the dashed line. Censored values are less than the laboratory level of quantification.", fig.alt="Alternative text for screen readers", fig.width=6, fig.height=8, fig.dpi=200}
 p1 <- df |> 
   filter(name %in% params[[8]]) |> 
   ggplot() +
@@ -383,7 +432,7 @@ p1 / p2 +
   
 ```
 
-```{r nitrite, fig.cap="Grab Nitrite-Nitrogen samples by (A) station and by (B) date. Censored values are less than the laboratory level of quantification.", fig.alt="Alternative text for screen readers", fig.width=6, fig.height=8, fig.dpi=200}
+```{r nitrite, fig.cap="Grab nitrite-nitrogen samples by (A) station and by (B) date. Censored values are less than the laboratory level of quantification.", fig.alt="Alternative text for screen readers", fig.width=6, fig.height=8, fig.dpi=200}
 p1 <- df |> 
   filter(name %in% params[[9]]) |> 
   ggplot() +
@@ -419,7 +468,7 @@ p1 / p2 +
 ```
 
 
-```{r ammonia, fig.cap="Grab Nitrogen-Ammonia samples by (A) station and by (B) date. Censored values are less than the laboratory level of quantification.", fig.alt="Alternative text for screen readers", fig.width=6, fig.height=8, fig.dpi=200}
+```{r ammonia, fig.cap="Grab nitrogen-ammonia samples by (A) station and by (B) date. Censored values are less than the laboratory level of quantification.", fig.alt="Alternative text for screen readers", fig.width=6, fig.height=8, fig.dpi=200}
 p1 <- df |> 
   filter(name %in% params[[10]]) |> 
   ggplot() +
@@ -455,7 +504,7 @@ p1 / p2 +
 ```
 
 
-```{r kjeldahl, fig.cap="Grab Nitrogen-Kjeldahl samples by (A) station and by (B) date. Censored values are less than the laboratory level of quantification.", fig.alt="Alternative text for screen readers", fig.width=6, fig.height=8, fig.dpi=200}
+```{r kjeldahl, fig.cap="Grab nitrogen-Kjeldahl samples by (A) station and by (B) date. Censored values are less than the laboratory level of quantification.", fig.alt="Alternative text for screen readers", fig.width=6, fig.height=8, fig.dpi=200}
 p1 <- df |> 
   filter(name %in% params[[11]]) |> 
   ggplot() +
@@ -491,7 +540,7 @@ p1 / p2 +
 ```
 
 
-```{r tp, fig.cap="Grab Total Phosphorus samples by (A) station and by (B) date. The dotted line indicates the 0.69 mg/L screening level. Censored values are less than the laboratory level of quantification.", fig.alt="Alternative text for screen readers", fig.width=6, fig.height=8, fig.dpi=200}
+```{r tp, fig.cap="Grab total phosphorus samples by (A) station and by (B) date. The dotted line indicates the 0.69 mg/L screening level. Censored values are less than the laboratory level of quantification.", fig.alt="Alternative text for screen readers", fig.width=6, fig.height=8, fig.dpi=200}
 p1 <- df |> 
   filter(name %in% params[[12]]) |> 
   ggplot() +
@@ -579,7 +628,14 @@ p1 / p2 +
 
 ```{r}
 ## leave in, ends word document section
-block_section(prop_section(type = "nextPage"))
+block_section(
+  prop_section(type = "nextPage", 
+               footer_default = block_list(
+                 fpar(run_word_field(field = "PAGE \\* ARABIC"),
+                      fp_p = fp_par(text.align = "center"))
+                 )
+               )
+  )
 ```
 
 # Bibliography {-}
@@ -588,8 +644,14 @@ block_section(prop_section(type = "nextPage"))
 
 ```{r}
 ## leave in, ends word document section
-
-block_section(prop_section(type = "nextPage"))
+block_section(
+  prop_section(type = "nextPage", 
+               footer_default = block_list(
+                 fpar(run_word_field(field = "PAGE \\* ARABIC"),
+                      fp_p = fp_par(text.align = "center"))
+                 )
+               )
+  )
 ```
 
 
@@ -598,22 +660,23 @@ block_section(prop_section(type = "nextPage"))
 
 ```{r}
 ## leave in, ends word document section
-
-block_section(prop_section(type = "nextPage"))
+block_section(
+  prop_section(type = "nextPage", 
+               footer_default = block_list(
+                 fpar(run_word_field(field = "PAGE \\* ARABIC"),
+                      fp_p = fp_par(text.align = "center"))
+                 )
+               )
+  )
 ```
+
+
+
 
 
 ## Ayish Bayou 0610A Data
 
-```{r}
-## leave in, ends word document section
-
-block_section(prop_section(type = "nextPage"))
-```
-
-<!---BLOCK_LANDSCAPE_START--->
-
-```{r ayishfield, tab.cap="Select field parameter measurements for Ayish Bayou Segment 0610A.", tab.id="ayishfield"}
+```{r ayishfield, tab.cap="Field parameter data for Ayish Bayou Segment 0610A.", tab.id="ayishfield"}
 
 
 df_field <- read_excel("../data/data.xlsx", col_types = c("text",
@@ -673,15 +736,11 @@ df |>
   flextable::padding(padding = 1, part = "all")
 ```
 
-
-<!---BLOCK_LANDSCAPE_STOP--->
-
+`r run_pagebreak()`
 
 ##  Caney Creek 0610G Data
 
-<!---BLOCK_LANDSCAPE_START--->
-
-```{r caneyfield, tab.cap="Select field parameter measurements for Caney Creek Segment 0610G.", tab.id="caneyfield"}
+```{r caneyfield, tab.cap="Field parameter data for Caney Creek Segment 0610G.", tab.id="caneyfield"}
 
 
 df_field |> 
@@ -700,7 +759,7 @@ df_field |>
 
 `r run_pagebreak()`
 
-```{r caney, tab.cap="Data records for Caney Creek Segment 0610G.", tab.id="caney"}
+```{r caney, tab.cap="Conventional and bacteria data for Caney Creek Segment 0610G.", tab.id="caney"}
 df |> 
   filter(`Station Id` %in% c("15362")) |> 
   select(tag, `Station Id`, Station_Desc, Date, name, value, censor) |> 
@@ -733,14 +792,13 @@ df |>
   flextable::padding(padding = 1, part = "all")
 ```
 
-<!---BLOCK_LANDSCAPE_STOP--->
-
+`r run_pagebreak()`
 
 ## Chiamon Bayou 0610I Data
 
-<!---BLOCK_LANDSCAPE_START--->
 
-```{r chiamonfield, tab.cap="Select field parameter measurements for Chiamon Bayou Segment 0610I.", tab.id="chiamonfield"}
+
+```{r chiamonfield, tab.cap="Field parameter data for Chiamon Bayou Segment 0610I.", tab.id="chiamonfield"}
 
 
 df_field |> 
@@ -759,7 +817,7 @@ df_field |>
 
 `r run_pagebreak()`
 
-```{r chiamon, tab.cap="Data records for Chiamon Bayou Segment 0610I.", tab.id="chiamon"}
+```{r chiamon, tab.cap="Conventional and bacteria data for Chiamon Bayou Segment 0610I.", tab.id="chiamon"}
 df |> 
   filter(`Station Id` %in% c("15359")) |> 
   select(tag, `Station Id`, Station_Desc, Date, name, value, censor) |> 
@@ -792,12 +850,13 @@ df |>
   flextable::padding(padding = 1, part = "all")
 ```
 
-<!---BLOCK_LANDSCAPE_STOP--->
+
+`r run_pagebreak()`
 
 ## Sandy Creek 0610K Data
 
-<!---BLOCK_LANDSCAPE_START--->
-```{r sandyfield, tab.cap="Select field parameter measurements for Sandy Creek Segment 0610K.", tab.id="sandyfield"}
+
+```{r sandyfield, tab.cap="Field parameter data for Sandy Creek Segment 0610K.", tab.id="sandyfield"}
 
 
 df_field |> 
@@ -816,7 +875,7 @@ df_field |>
 
 `r run_pagebreak()`
 
-```{r sandy, tab.cap="Data records for Sandy Creek Segment 0610K.", tab.id="sandy"}
+```{r sandy, tab.cap="Conventional and bacteria data for Sandy Creek Segment 0610K.", tab.id="sandy"}
 df |> 
   filter(`Station Id` %in% c("15358")) |> 
   select(tag, `Station Id`, Station_Desc, Date, name, value, censor) |> 
@@ -849,14 +908,12 @@ df |>
   flextable::padding(padding = 1, part = "all")
 ```
 
-<!---BLOCK_LANDSCAPE_STOP--->
+`r run_pagebreak()`
 
 ## Venado Creek 0610M Data
 
-<!---BLOCK_LANDSCAPE_START--->
 
-
-```{r venadofield, tab.cap="Select field parameter measurements for Venado Creek Segment 0610M.", tab.id="venadofield"}
+```{r venadofield, tab.cap="Field parameter data for Venado Creek Segment 0610M.", tab.id="venadofield"}
 
 
 df_field |> 
@@ -875,7 +932,7 @@ df_field |>
 
 `r run_pagebreak()`
 
-```{r venado, tab.cap="Data records for Venado Creek Segment 0610M.", tab.id="venado"}
+```{r venado, tab.cap="Conventional and bacteria data for Venado Creek Segment 0610M.", tab.id="venado"}
 df |> 
   filter(`Station Id` %in% c("15363")) |> 
   select(tag, `Station Id`, Station_Desc, Date, name, value, censor) |> 
@@ -908,4 +965,28 @@ df |>
   flextable::padding(padding = 1, part = "all")
 ```
 
-<!---BLOCK_LANDSCAPE_STOP--->
+```{r}
+block_section(
+  prop_section(
+    page_size = page_size(orient = "landscape"),
+    type = "nextPage",
+    footer_default = block_list(
+                 fpar(run_word_field(field = "PAGE \\* ARABIC"),
+                      fp_p = fp_par(text.align = "center"))
+                 )
+  )
+)
+```
+
+
+```{r}
+## leave in, ends word document section
+block_section(
+  prop_section(type = "continuous", 
+               footer_default = block_list(
+                 fpar(run_word_field(field = "PAGE \\* ARABIC"),
+                      fp_p = fp_par(text.align = "center"))
+                 )
+               )
+  )
+```
